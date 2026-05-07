@@ -4,6 +4,7 @@
 # Abilita solo i seguenti file
 !.gitignore
 !LICENSE
+!README.md
 
 # Abilita solo le seguenti cartelle con i rispettivi contenuti
 !driver/
