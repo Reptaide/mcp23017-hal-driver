@@ -1,5 +1,5 @@
 ## :package: MCP23017 HAL Driver Library
-HAL Driver Library for the Microchip MCP23017 I/O Expander.
+HAL Driver Library for the MCP23017 I/O Expander.
 
 This driver has been developed to be hardware-independent.
 This way, the functions present in the `core` can be used as-is on any other microcontroller.
