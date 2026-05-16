@@ -12,12 +12,13 @@ extern "C"
 #endif
 
     /**
-     * @brief Inizializza l'interfaccia hardware del dispositivo MCP23017.
+     * @brief Inizializza l'interfaccia hardware del dispositivo.
      *
      * @param[in] device                Dispositivo MCP23017.
      * @param[in] bus_handle            Handle del bus I2C.
      * @param[in] i2c_address           Indirizzo I2C del dispositivo.
      * @param[in] i2c_scl_speed         Velocità di clock del dispositivo sul bus I2C.
+     * @param[in] i2c_timeout           Valore del timeout I2C del dispositivo
      * @retval MCP23017_ERR_OK          Successo.
      * @retval MCP23017_ERR_INVALID_ARG Parametri non validi.
      * @retval MCP23017_ERR_FAIL        Errore nella configurazione dell'ISR o del pin.

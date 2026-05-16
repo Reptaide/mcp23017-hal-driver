@@ -104,7 +104,7 @@ static mcp23017_err_t read_register_8(mcp23017_t *device, const uint8_t reg, uin
 }
 
 /**
- * @brief Scive un byte (8 bit) in un registro del dispositivo, tramite il protocollo I2C.
+ * @brief Scrive un byte (8 bit) in un registro del dispositivo, tramite il protocollo I2C.
  *
  * @param[in] device                Dispositivo MCP23017.
  * @param[in] reg                   Indirizzo del registro.

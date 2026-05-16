@@ -1,12 +1,12 @@
 # Ignora tutto (cartelle e file)
 *
 
-# Abilita solo i seguenti file
+# Abilita i seguenti file
 !.gitignore
 !LICENSE
 !README.md
 
-# Abilita solo le seguenti cartelle con i rispettivi contenuti
+# Abilita le seguenti cartelle con i rispettivi contenuti
 !driver/
 !driver/**
 !examples/

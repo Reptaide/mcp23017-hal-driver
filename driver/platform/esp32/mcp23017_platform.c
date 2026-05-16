@@ -6,8 +6,6 @@
 #include "driver/i2c_master.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "mcp23017_core.h"
-#include "soc/gpio_num.h"
 
 /**
  * @brief Questa è la funzione che viene chiamata dopo un evento di interrupt.
@@ -25,9 +23,9 @@ static void IRAM_ATTR gpio_isr_handler(void *arg)
 /**
  * @brief Implementa la logica per leggere il buffer I2C tramite ESP32.
  *
- * @param[in] handle                Dispositivo MCP23017.
- * @param[in] reg                   Indirizzo del registro.
- * @param[in] length                Dimensione del buffer.
+ * @param[in]  handle               Dispositivo MCP23017.
+ * @param[in]  reg                  Indirizzo del registro.
+ * @param[in]  length               Dimensione del buffer.
  * @param[out] data                 Buffer dei dati da ricevere.
  * @retval MCP23017_ERR_OK          Successo.
  * @retval MCP23017_ERR_INVALID_ARG Parametri non validi.
@@ -64,7 +62,7 @@ static mcp23017_err_t i2c_read_register(void *handle, const uint8_t reg, uint8_t
  * @param[in] handle                Dispositivo MCP23017.
  * @param[in] reg                   Indirizzo del registro.
  * @param[in] length                Dimensione del buffer.
- * @param[out] data                 Buffer dei dati da inviare.
+ * @param[in] data                  Buffer dei dati da inviare.
  * @retval MCP23017_ERR_OK          Successo.
  * @retval MCP23017_ERR_INVALID_ARG Parametri non validi.
  * @retval MCP23017_ERR_FAIL        Errore durante la ricezione dei dati.
@@ -108,7 +106,7 @@ mcp23017_err_t mcp23017_init_hal(mcp23017_t *device,
     const int32_t i2c_timeout)
 {
     // Verifica i parametri
-    if (!device)
+    if (!device || !bus_handle)
         return MCP23017_ERR_INVALID_ARG;
 
     if (i2c_address < 0x20 || i2c_address > 0x27)
@@ -149,25 +147,21 @@ mcp23017_err_t mcp23017_init_hal(mcp23017_t *device,
 
 mcp23017_err_t mcp23017_hal_setup_int(mcp23017_t *device, int8_t int_pin_a, int8_t int_pin_b)
 {
-    // Verifica il parametro
-    if (!device)
+    // Verifica i parametri
+    if (!device || int_pin_a > GPIO_NUM_MAX || int_pin_b > GPIO_NUM_MAX)
         return MCP23017_ERR_INVALID_ARG;
 
     esp_err_t status = ESP_OK;
 
     if (int_pin_a > GPIO_NUM_NC)
     {
-        device->int_pin[0] = int_pin_a;
-        device->isr_event[0].device = device;
-        device->isr_event[0].port = MCP23017_PORT_A;
-
         // Configurazione del pin INTA
         gpio_config_t int_pin_config_a = {
-            .intr_type = GPIO_INTR_NEGEDGE,               // Imposta l'interrupt active-low
-            .mode = GPIO_MODE_INPUT,                      // Configura il pin come input
-            .pin_bit_mask = (1ULL << device->int_pin[0]), // Valore del pin da configurare
-            .pull_down_en = GPIO_PULLDOWN_DISABLE,        // Disabilita il pull-down interno sul pin
-            .pull_up_en = GPIO_PULLUP_ENABLE,             // Abilita il pull-up interno sul pin
+            .intr_type = GPIO_INTR_NEGEDGE,        // Imposta l'interrupt active-low
+            .mode = GPIO_MODE_INPUT,               // Configura il pin come input
+            .pin_bit_mask = (1ULL << int_pin_a),   // Valore del pin da configurare
+            .pull_down_en = GPIO_PULLDOWN_DISABLE, // Disabilita il pull-down interno sul pin
+            .pull_up_en = GPIO_PULLUP_ENABLE,      // Abilita il pull-up interno sul pin
         };
 
         // Applica la configurazione al GPIO
@@ -181,21 +175,22 @@ mcp23017_err_t mcp23017_hal_setup_int(mcp23017_t *device, int8_t int_pin_a, int8
 
         if (status != ESP_OK)
             return MCP23017_ERR_FAIL;
+
+        // Aggiorna i campi del dispositivo
+        device->int_pin[0] = int_pin_a;
+        device->isr_event[0].device = device;
+        device->isr_event[0].port = MCP23017_PORT_A;
     }
 
     if (int_pin_b > GPIO_NUM_NC)
     {
-        device->int_pin[1] = int_pin_b;
-        device->isr_event[1].device = device;
-        device->isr_event[1].port = MCP23017_PORT_B;
-
         // Configurazione del pin INTB
         gpio_config_t int_pin_config_b = {
-            .intr_type = GPIO_INTR_NEGEDGE,               // Imposta l'interrupt active-low
-            .mode = GPIO_MODE_INPUT,                      // Configura il pin come input
-            .pin_bit_mask = (1ULL << device->int_pin[1]), // Valore del pin da configurare
-            .pull_down_en = GPIO_PULLDOWN_DISABLE,        // Disabilita il pull-down interno sul pin
-            .pull_up_en = GPIO_PULLUP_ENABLE,             // Disabilita il pull-up interno sul pin
+            .intr_type = GPIO_INTR_NEGEDGE,        // Imposta l'interrupt active-low
+            .mode = GPIO_MODE_INPUT,               // Configura il pin come input
+            .pin_bit_mask = (1ULL << int_pin_b),   // Valore del pin da configurare
+            .pull_down_en = GPIO_PULLDOWN_DISABLE, // Disabilita il pull-down interno sul pin
+            .pull_up_en = GPIO_PULLUP_ENABLE,      // Disabilita il pull-up interno sul pin
         };
 
         // Applica la configurazione al GPIO
@@ -209,6 +204,11 @@ mcp23017_err_t mcp23017_hal_setup_int(mcp23017_t *device, int8_t int_pin_a, int8
 
         if (status != ESP_OK)
             return MCP23017_ERR_FAIL;
+
+        // Aggiorna i campi del dispositivo
+        device->int_pin[1] = int_pin_b;
+        device->isr_event[1].device = device;
+        device->isr_event[1].port = MCP23017_PORT_B;
     }
 
     return MCP23017_ERR_OK;

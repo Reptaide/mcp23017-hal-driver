@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-#ifndef MCP23017_H
-#define MCP23017_H
+#ifndef MCP23017_CORE_H
+#define MCP23017_CORE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -317,11 +317,10 @@ extern "C"
         mcp23017_t *device, const uint8_t port, uint8_t *source, uint8_t *state);
 
     /**
-     * @brief Questa funzione salva nella struttura del dispositivo i puntatori
-     * delle funzioni da utilizzare in caso di interrupt.
+     * @brief Registra la callback chiamata al verificarsi di un interrupt hardware.
      *
      * @param[in] device                Dispositivo MCP23017.
-     * @param[in] callback              Funzione eseguita all'arrivo dell'interrupt.
+     * @param[in] callback              Funzione invocata dalla ISR.
      * @retval MCP23017_ERR_OK          Successo.
      * @retval MCP23017_ERR_INVALID_ARG Parametri non validi.
      */
@@ -332,4 +331,4 @@ extern "C"
 }
 #endif
 
-#endif // MCP23017_H
+#endif // MCP23017_CORE_H

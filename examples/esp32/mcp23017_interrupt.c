@@ -130,6 +130,7 @@ void app_main(void)
     // Definisce e inizializza a zero il dispositivo
     mcp23017_t device = {0};
 
+    // Inizializza il platform del dispositivo per comunicare con l'hardware
     mcp23017_init_hal(&device, i2c_bus_handle, I2C_ADDRESS, I2C_SCL_SPEED_HZ, I2C_TIMEOUT);
 
     // Config 0b01000000, un solo pin di interrupt per entrambe le porte (mirror = 1)
@@ -149,7 +150,7 @@ void app_main(void)
     // Crea il task per gestire l'evento del sensore
     xTaskCreate(mcp23017_task, "mcp23017_task", 4096, &device, 5, &mcp23017_task_handle);
 
-    // Registra il callback ISR
+    // Registra la callback dell'interrupt (chiamare prima di mcp23017_hal_setup_int)
     mcp23017_register_isr_callback(&device, mcp23017_isr_callback);
 
     // Configura i pin di interrupt per entrambe le porte
