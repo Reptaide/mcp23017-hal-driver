@@ -1,4 +1,11 @@
-// SPDX-License-Identifier: MIT
+/*
+ * SPDX-License-Identifier: MIT
+ *
+ * Copyright (c) 2026 Reptaide.
+ *
+ * Released under the terms of the MIT License.
+ * See LICENSE in the root of this repository for the full license text.
+ */
 
 #include "mcp23017_core.h"
 
