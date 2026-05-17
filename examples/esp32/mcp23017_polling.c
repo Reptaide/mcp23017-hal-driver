@@ -43,7 +43,12 @@ static void print_reg_8(const char *name, const uint8_t value)
         (value >> 0) & 0x01);
 }
 
-void i2c_bus_init(i2c_master_bus_handle_t *p_i2c_bus_handle)
+/**
+ * @brief Inizializza e configura il bus I2C.
+ *
+ * @param[in] i2c_bus_handle Handle del bus I2C.
+ */
+void i2c_bus_init(i2c_master_bus_handle_t *i2c_bus_handle)
 {
     // Configura il bus I2C
     i2c_master_bus_config_t i2c_bus_config = {
@@ -52,11 +57,11 @@ void i2c_bus_init(i2c_master_bus_handle_t *p_i2c_bus_handle)
         .scl_io_num = I2C_PIN_SCL,
         .clk_source = I2C_CLK_SRC_DEFAULT,
         .glitch_ignore_cnt = 7,
-        .flags.enable_internal_pullup = false, // Disabilita il pull-up interno perché troppo debole
+        .flags.enable_internal_pullup = false,
     };
 
     // Inizializza il bus I2C
-    ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_bus_config, p_i2c_bus_handle));
+    ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_bus_config, i2c_bus_handle));
 
     ESP_LOGI(TAG, "I2C bus initialized successfully");
 }
@@ -72,7 +77,7 @@ void app_main(void)
     // Definisce e inizializza a zero il dispositivo
     mcp23017_t device = {0};
 
-    // Inizializza il platform del dispositivo per comunicare con l'hardware
+    // Inizializza il platform per comunicare con l'hardware
     mcp23017_init_hal(&device, i2c_bus_handle, I2C_ADDRESS, I2C_SCL_SPEED_HZ, I2C_TIMEOUT);
 
     // Inizializza il core del dispositivo con la configurazione specificata
